@@ -2,7 +2,7 @@
 
 ![Screen](screenshots/screen.png)
 
-This is a system monitoring application developed in Java using the Model-View-Controller (MVC) architectural pattern. It allows monitoring and displaying information about system memory usage, CPU usage, and processes.
+This Java and Swing-based system monitoring application, following the Model-View-Controller (MVC) architectural pattern, provides users with a comprehensive and real-time view of system performance. It allows monitoring system memory usage, CPU usage, and processes through an intuitive graphical interface. Users can track memory allocation patterns, optimize CPU resource usage, and identify resource-intensive processes for efficient system management. Designed for usability, it offers real-time updates and dynamic graphs, ensuring a smooth monitoring experience. In summary, this application offers a powerful solution for monitoring and optimizing system performance, facilitating efficient and reliable system operation.
 
 ## Project Structure
 
@@ -11,6 +11,18 @@ The project is organized into three main packages:
 - **org.example.controller:** Contains classes responsible for the system's control logic.
 - **org.example.model:** Contains classes representing the system's data model.
 - **org.example.view:** Contains classes responsible for the user interface.
+
+## Technologies used
+
+1. Java: As the main programming language, Java offers portability and wide adoption, making it a popular choice for desktop applications.
+
+2. Swing: This GUI library for Java provides a variety of graphical components for creating intuitive and interactive user interfaces.
+
+3. Model-View-Controller (MVC): The MVC architectural pattern is used to separate the components of the application into three main parts: Model, View, and Controller. This helps organize the code, improving the maintenance and extensibility of the application.
+
+4. JFreeChart: This Java library allows for programmatically creating charts. In the system monitoring application, JFreeChart is used to display bar charts representing CPU and memory usage.
+
+5. oshi: A Java library for accessing operating system information, such as memory usage, CPU load, and details of running processes. oshi provides valuable data for monitoring real-time system performance.
 
 ## System Requirements
 
