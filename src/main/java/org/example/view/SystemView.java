@@ -1,57 +1,75 @@
 package org.example.view;
 
-import static com.sun.tools.javac.util.Constants.format;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.text.DecimalFormat;
-import java.util.List;
 import javax.swing.table.DefaultTableModel;
-import oshi.software.os.OSProcess;
-import oshi.util.FormatUtil;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
 
+/**
+ * The type System view.
+ */
 public class SystemView extends JFrame {
-  private JLabel timeLabel;
-  private JLabel totalMemoryLabel;
-  private JLabel usedMemoryLabel;
-  private JLabel freeMemoryLabel;
-  private JLabel usedPercentageLabel;
+  private final JLabel totalMemoryLabel;
+  private final JLabel usedMemoryLabel;
+  private final JLabel freeMemoryLabel;
+  private final JLabel usedPercentageLabel;
+  private final JPanel systemInfoPanel;
+  private final ChartPanel memoryChartPanel;
+  private final ChartPanel cpuChartPanel;
   private final JTable processTable;
 
+  /**
+   * Instantiates a new System view.
+   */
   public SystemView() {
-    setTitle("System Monitor");
+    super("System Monitor");
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setLayout(new BorderLayout());
     setPreferredSize(new Dimension(800, 700));
 
-    JPanel systemInfoPanel = createSystemInfoPanel();
-    add(systemInfoPanel, BorderLayout.WEST);
+    JPanel mainPanel = new JPanel(new BorderLayout());
+    mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-    processTable = new JTable();
-    JScrollPane scrollPane = new JScrollPane(processTable);
-    scrollPane.setBorder(BorderFactory.createTitledBorder("Top Processes"));
-    add(scrollPane, BorderLayout.CENTER);
-  }
-
-  private JPanel createSystemInfoPanel() {
-    JPanel systemInfoPanel = new JPanel(new GridLayout(5, 1));
-    systemInfoPanel.setBorder(BorderFactory.createTitledBorder("System Information"));
+    // System Information Panel
+    systemInfoPanel = new JPanel(new GridLayout(5, 1));
+    systemInfoPanel.setBorder(BorderFactory.createTitledBorder("Memory Information"));
     systemInfoPanel.setPreferredSize(new Dimension(250, 0));
+    mainPanel.add(systemInfoPanel, BorderLayout.WEST);
 
-    timeLabel = createLabel("Time: ");
     totalMemoryLabel = createLabel("Total Memory (MB): ");
     usedMemoryLabel = createLabel("Used Memory (MB): ");
     freeMemoryLabel = createLabel("Free Memory (MB): ");
     usedPercentageLabel = createLabel("Used Memory (%): ");
 
-    systemInfoPanel.add(timeLabel);
-    systemInfoPanel.add(totalMemoryLabel);
-    systemInfoPanel.add(usedMemoryLabel);
-    systemInfoPanel.add(freeMemoryLabel);
-    systemInfoPanel.add(usedPercentageLabel);
+    addLabel(totalMemoryLabel);
+    addLabel(usedMemoryLabel);
+    addLabel(freeMemoryLabel);
+    addLabel(usedPercentageLabel);
 
-    return systemInfoPanel;
+    // Memory Chart
+    memoryChartPanel = new ChartPanel(null);
+    memoryChartPanel.setPreferredSize(new Dimension(300, 300));
+    memoryChartPanel.setBorder(BorderFactory.createTitledBorder("Memory Usage"));
+    mainPanel.add(memoryChartPanel, BorderLayout.CENTER);
+
+    // CPU Chart
+    cpuChartPanel = new ChartPanel(null);
+    cpuChartPanel.setPreferredSize(new Dimension(300, 300));
+    cpuChartPanel.setBorder(BorderFactory.createTitledBorder("CPU Usage"));
+    mainPanel.add(cpuChartPanel, BorderLayout.EAST);
+
+    // Process Table
+    String[] columnNames = {"PID", "Process Name", "Memory (MB)", "CPU (%)"};
+    DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+    processTable = new JTable(tableModel);
+    processTable.setFillsViewportHeight(true);
+    JScrollPane scrollPane = new JScrollPane(processTable);
+    scrollPane.setBorder(BorderFactory.createTitledBorder("Top Processes"));
+    mainPanel.add(scrollPane, BorderLayout.SOUTH);
+
+    add(mainPanel);
   }
 
   private JLabel createLabel(String text) {
@@ -60,28 +78,62 @@ public class SystemView extends JFrame {
     return label;
   }
 
-  public void updateData(long totalMemory, long usedMemory, double usedPercentage, List<OSProcess> processes) {
-    DecimalFormat df = new DecimalFormat("#.##");
-
-    timeLabel.setText("Time: " + java.time.LocalTime.now().toString());
-    totalMemoryLabel.setText("Total Memory (MB): " + totalMemory);
-    usedMemoryLabel.setText("Used Memory (MB): " + usedMemory);
-    freeMemoryLabel.setText("Free Memory (MB): " + (totalMemory - usedMemory));
-    usedPercentageLabel.setText("Used Memory (%): " + df.format(usedPercentage));
-
-    updateProcessTable(processes);
+  private void addLabel(JLabel label) {
+    systemInfoPanel.add(label);
   }
 
-  private void updateProcessTable(List<OSProcess> processes) {
-    DefaultTableModel tableModel = (DefaultTableModel) processTable.getModel();
-    tableModel.setRowCount(0);
+  /**
+   * Update memory chart.
+   *
+   * @param chart the chart
+   */
+  public void updateMemoryChart(JFreeChart chart) {
+    memoryChartPanel.setChart(chart);
+  }
 
-    for (OSProcess p : processes) {
-      tableModel.addRow(new Object[]{
-          p.getProcessID(),
-          p.getName(),
-          FormatUtil.formatBytes(p.getResidentSetSize())
-      });
-    }
+  /**
+   * Update cpu chart.
+   *
+   * @param chart the chart
+   */
+  public void updateCPUChart(JFreeChart chart) {
+    cpuChartPanel.setChart(chart);
+  }
+
+  /**
+   * Update process table.
+   *
+   * @param tableModel the table model
+   */
+  public void updateProcessTable(DefaultTableModel tableModel) {
+    processTable.setModel(tableModel);
+  }
+
+  /**
+   * Update system info.
+   *
+   * @param totalMemory    the total memory
+   * @param usedMemory     the used memory
+   * @param freeMemory     the free memory
+   * @param usedPercentage the used percentage
+   */
+  public void updateSystemInfo(String totalMemory, String usedMemory, String freeMemory, String usedPercentage) {
+    totalMemoryLabel.setText("Total Memory (MB): " + totalMemory);
+    usedMemoryLabel.setText("Used Memory (MB): " + usedMemory);
+    freeMemoryLabel.setText("Free Memory (MB): " + freeMemory);
+    usedPercentageLabel.setText("Used Memory (%): " + usedPercentage);
+  }
+
+  /**
+   * The entry point of application.
+   *
+   * @param args the input arguments
+   */
+  public static void main(String[] args) {
+    SwingUtilities.invokeLater(() -> {
+      SystemView view = new SystemView();
+      view.pack();
+      view.setVisible(true);
+    });
   }
 }

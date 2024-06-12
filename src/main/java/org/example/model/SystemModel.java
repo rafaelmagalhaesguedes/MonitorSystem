@@ -1,41 +1,52 @@
 package org.example.model;
 
-import java.util.Comparator;
-import java.util.List;
-
 import oshi.SystemInfo;
 import oshi.hardware.GlobalMemory;
 import oshi.software.os.OSProcess;
 import oshi.software.os.OperatingSystem;
-import oshi.util.FormatUtil;
 
+import java.util.List;
+
+/**
+ * The type System model.
+ */
 public class SystemModel {
-
   private final GlobalMemory memory;
   private final OperatingSystem os;
 
+  /**
+   * Instantiates a new System model.
+   */
   public SystemModel() {
     SystemInfo si = new SystemInfo();
     memory = si.getHardware().getMemory();
     os = si.getOperatingSystem();
   }
 
-  public long getTotalMemory() {
-    return memory.getTotal() / 1024 / 1024;
+  /**
+   * Gets memory.
+   *
+   * @return the memory
+   */
+  public GlobalMemory getMemory() {
+    return memory;
   }
 
-  public long getUsedMemory() {
-    long availableMemory = memory.getAvailable() / 1024 / 1024;
-    return getTotalMemory() - availableMemory;
+  /**
+   * Gets operating system.
+   *
+   * @return the operating system
+   */
+  public OperatingSystem getOperatingSystem() {
+    return os;
   }
 
-  public double getUsedPercentage() {
-    return (double) getUsedMemory() / getTotalMemory() * 100;
-  }
-
+  /**
+   * Gets processes.
+   *
+   * @return the processes
+   */
   public List<OSProcess> getProcesses() {
-    List<OSProcess> procs = os.getProcesses();
-    procs.sort(Comparator.comparingDouble(p -> -100d * (p.getKernelTime() + p.getUserTime()) / p.getUpTime()));
-    return procs;
+    return os.getProcesses();
   }
 }
