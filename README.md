@@ -1,4 +1,4 @@
-# System Monitoring System (Java MVC)
+# System Monitoring System
 
 ![Screen](screenshots/screen.png)
 
